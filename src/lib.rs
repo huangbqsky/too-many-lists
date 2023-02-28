@@ -1,1 +1,2 @@
-pub mod first; // 一个非常简单的链表
+pub mod first;  // 第一个简单链表
+pub mod second; // 第二个简单链表
