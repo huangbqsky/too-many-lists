@@ -40,6 +40,22 @@ impl<T> List<T> {
     pub fn peek_mut(&mut self) -> Option<&mut T> {
         self.head.as_mut().map(|node| &mut node.elem)
     }
+
+    // into_iter迭代
+    pub fn into_iter(self) -> IntoIter<T> {
+        IntoIter(self)
+    }
+
+    // iter迭代
+    pub fn iter(&self) -> Iter<'_, T> {
+        Iter {next: self.head.as_deref()}
+    }
+
+    // iter_mut迭代
+    pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+        IterMut {next: self.head.as_deref_mut()}
+    }
+
 }
 
 // 为链表 List 实现 Drop trait
@@ -49,6 +65,43 @@ impl<T> Drop for List<T> {
         while let Some(mut boxed_node) = curr_link {
             curr_link = boxed_node.next.take();
         }
+    }
+}
+
+pub struct IntoIter<T>(List<T>); // 为实现 IntoIter 结构体
+
+impl<T> Iterator for IntoIter<T> { // 实现 Iterator trait
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.pop()
+    }
+}
+
+pub struct Iter<'a, T> { // 为实现 Iter结构体
+    next: Option<&'a Node<T>>,
+}
+
+impl<'a, T> Iterator for Iter<'a, T> { // 实现 Iterator trait
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.map(|node|{
+            self.next = node.next.as_deref();
+            &node.elem
+        })
+    }
+}
+
+pub struct IterMut<'a, T> { // 为实现 IterMut结构体
+    next: Option<&'a mut Node<T>>,
+}
+
+impl<'a, T> Iterator for IterMut<'a, T> { // 实现 Iterator trait
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.take().map(|node| {
+            self.next = node.next.as_deref_mut();
+            &mut node.elem
+        })
     }
 }
 
@@ -101,4 +154,39 @@ mod test {
         assert_eq!(list.peek(), Some(&42));
         assert_eq!(list.pop(), Some(42));
     }
+
+    #[test]
+    fn into_iter() {
+        let mut list = List::new();
+        list.push(1); list.push(2); list.push(3);
+
+        let mut iter = list.into_iter();
+        assert_eq!(iter.next(), Some(3));
+        assert_eq!(iter.next(), Some(2));
+        assert_eq!(iter.next(), Some(1));
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn iter() {
+        let mut list = List::new();
+        list.push(1); list.push(2); list.push(3);
+
+        let mut iter = list.iter();
+        assert_eq!(iter.next(), Some(&3));
+        assert_eq!(iter.next(), Some(&2));
+        assert_eq!(iter.next(), Some(&1));
+    }
+
+    #[test]
+    fn iter_mut() {
+        let mut list = List::new();
+        list.push(1); list.push(2); list.push(3);
+
+        let mut iter = list.iter_mut();
+        assert_eq!(iter.next(), Some(&mut 3));
+        assert_eq!(iter.next(), Some(&mut 2));
+        assert_eq!(iter.next(), Some(&mut 1));
+    }
+
 }
