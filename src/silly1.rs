@@ -6,12 +6,13 @@ pub struct Stack<T> { // Stack 结构体
 
 type Link<T> = Option<Box<Node<T>>>; // 类型别名，type alias
 
-struct Node<T> { // 链表节点
+struct Node<T> { // 一个单链表节点
     elem: T,
     next: Link<T>,
 }
 
 impl<T> Stack<T> {
+    // 构造新的Stack单向链表:
     pub fn new() -> Self {
         Stack { head: None }
     }
@@ -65,20 +66,21 @@ impl<T> Drop for Stack<T> {
     }
 }
 
-
-struct List<T> {
+struct List<T> { // 双单向链表 : 链表的其中一半朝左，另一半朝右
     left: Stack<T>,
     right: Stack<T>,
 }
 
 impl<T> List<T> {
+    // 构造新的双单向链表:
     fn new() -> Self {
         List {
             left: Stack::new(),
             right: Stack::new(),
         }
     }
-
+    /// 一大堆左左右右类型的操作:
+    /// 
     pub fn push_left(&mut self, elem: T) {
         self.left.push(elem)
     }
@@ -104,6 +106,8 @@ impl<T> List<T> {
         self.right.peek_mut()
     }
 
+   /// 左右可以来回闲逛了
+   /// 
     pub fn go_left(&mut self) -> bool {
         self.left.pop_node().map(|node| {
             self.right.push_node(node);
