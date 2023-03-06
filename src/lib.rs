@@ -5,3 +5,4 @@ pub mod fourth; // 一个不咋滴的双向链表 (功能残缺的，只实现�
 pub mod fifth; //  一个不错的的unsafe单向链表: 使用裸指针和 unsafe 代码实现一个单向链表
 
 pub mod silly1;     // 双单向链表 : 链表的其中一半朝左，另一半朝右
+pub mod silly2; // 栈上的链表
