@@ -1,14 +1,8 @@
 ///! 栈上的链表
-/// 
-// 新的栈上的链表类型本身就是一个 Node，并且包含一个引用指向另一个 Node
+/// 新的栈上的链表类型本身就是一个 Node，并且包含一个引用指向另一个 Node
 pub struct List<'a, T> {
     pub data: T,
     pub prev: Option<&'a List<'a, T>>,
-}
-
-// 迭代器
-pub struct Iter<'a, T> {
-    next: Option<&'a List<'a, T>>,
 }
 
 impl <'a, T> List<'a, T> {
@@ -27,8 +21,13 @@ impl <'a, T> List<'a, T> {
         Iter{ next: Some(self)}
     }   
 }
+// 迭代包装结构体
+pub struct Iter<'a, T> { 
+    next: Option<&'a List<'a, T>>,
+}
 
-impl<'a, T> Iterator for Iter<'a, T> {
+// 实现迭代器
+impl<'a, T> Iterator for Iter<'a, T> { 
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         self.next.map(|node| {
